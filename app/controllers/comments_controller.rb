@@ -3,8 +3,13 @@ class CommentsController < ApplicationController
         post = Post.find(params[:post_id])
         comment = current_user.comments.new(comment_params)
         comment.post_id = post.id
-        comment.save
-        redirect_to post_path(post)
+        if @comment.save
+            redirect_to post_path(post)
+        else
+            @post = Post.find(params[:post_id])
+            @comments = @post.comments.page(params[:page]).per(7).reverse_order
+            render 'posts/show', status: :unprocessable_entity
+        end
     end
 
     def destroy
